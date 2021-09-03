@@ -10,32 +10,62 @@ let app = http.createServer((request, response) => {
   let pathname = url.parse(_url, true).pathname;
 
   if (pathname === "/") {
-    fs.readFile(`data/${title}`, "utf8", (err, data) => {
+    if (queryData.id === undefined) {
+      let title = "Welcome";
+      data = "Hello, Node.js";
       let template = `
-      <!DOCTYPE html>
-    <html>
-      <head>
-        <title>WEB1 - ${title}</title>
-        <meta charset="utf-8" />
-      </head>
-      <body>
-        <h1><a href="/">WEB</a></h1>
-        <ul>
-          <li><a href="/?id=HTML">HTML</a></li>
-          <li><a href="/?id=CSS">CSS</a></li>
-          <li><a href="/?id=JavaScript">JavaScript</a></li>
-        </ul>
-        <h2>${title}</h2>
-        <p>
-        ${data}
-        </p>
-      </body>
-    </html>
-      `;
+        <!DOCTYPE html>
+      <html>
+        <head>
+          <title>WEB1 - ${title}</title>
+          <meta charset="utf-8" />
+        </head>
+        <body>
+          <h1><a href="/">WEB</a></h1>
+          <ul>
+            <li><a href="/?id=HTML">HTML</a></li>
+            <li><a href="/?id=CSS">CSS</a></li>
+            <li><a href="/?id=JavaScript">JavaScript</a></li>
+          </ul>
+          <h2>${title}</h2>
+          <p>
+          ${data}
+          </p>
+        </body>
+      </html>
+        `;
 
       response.writeHead(200);
       response.end(template);
-    });
+    } else {
+      fs.readFile(`data/${queryData.id}`, "utf8", (err, data) => {
+        let title = queryData.id;
+        let template = `
+        <!DOCTYPE html>
+      <html>
+        <head>
+          <title>WEB1 - ${title}</title>
+          <meta charset="utf-8" />
+        </head>
+        <body>
+          <h1><a href="/">WEB</a></h1>
+          <ul>
+            <li><a href="/?id=HTML">HTML</a></li>
+            <li><a href="/?id=CSS">CSS</a></li>
+            <li><a href="/?id=JavaScript">JavaScript</a></li>
+          </ul>
+          <h2>${title}</h2>
+          <p>
+          ${data}
+          </p>
+        </body>
+      </html>
+        `;
+
+        response.writeHead(200);
+        response.end(template);
+      });
+    }
   } else {
     response.writeHead(404);
     response.end("Not Found");
