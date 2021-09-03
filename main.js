@@ -1,16 +1,43 @@
 let http = require("http");
 let fs = require("fs");
+let url = require("url");
 
 //웹 서버 객체를 만들때 createServer 를 이용
 let app = http.createServer((request, response) => {
-  let url = request.url;
-  if (url == "/") {
-    url = "/index.html";
+  let _url = request.url;
+  let queryData = url.parse(_url, true).query;
+  let title = queryData.id;
+
+  if (_url == "/") {
+    title = "Welcome";
   }
-  if (url == "/favicon.ico") {
+  if (_url == "/favicon.ico") {
     return response.writeHead(404);
   }
   response.writeHead(200);
-  response.end(fs.readFileSync(__dirname + url));
+  fs.readFile(`data/${title}`, "utf8", (err, data) => {
+    let template = `
+    <!DOCTYPE html>
+  <html>
+    <head>
+      <title>WEB1 - ${title}</title>
+      <meta charset="utf-8" />
+    </head>
+    <body>
+      <h1><a href="/">WEB</a></h1>
+      <ul>
+        <li><a href="/?id=HTML">HTML</a></li>
+        <li><a href="/?id=CSS">CSS</a></li>
+        <li><a href="/?id=JavaScript">JavaScript</a></li>
+      </ul>
+      <h2>${title}</h2>
+      <p>
+      ${data}
+      </p>
+    </body>
+  </html>
+    `;
+    response.end(template);
+  });
 });
 app.listen(3000); //서버가 사용하고자 하는 포트 번호
