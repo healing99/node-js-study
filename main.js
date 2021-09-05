@@ -85,7 +85,7 @@ let app = http.createServer((request, response) => {
         title,
         list,
         `
-      <form action="http://localhost:3000/create_process" method="post">
+      <form action="/create_process" method="post">
       <p><input type="text" name="title" placeholder="title"/></p>
       <p><textarea name="description" placeholder="description"></textarea></p>
       <p><input type="submit" /></p>
@@ -114,9 +114,39 @@ let app = http.createServer((request, response) => {
         response.end();
       });
     });
+  } else if (pathname === "/update") {
+    fs.readdir("./data", (error, fileList) => {
+      fs.readFile(`data/${queryData.id}`, "utf8", (err, data) => {
+        const title = queryData.id;
+        const list = templateList(fileList);
+        const template = templateHTML(
+          title,
+          list,
+          ` 
+          <form action="/update_process" method="post">
+          <input type="hidden" name="id" value="${title}">
+          <p><input type="text" name="title" placeholder="title" value="${title}"/></p>
+          <p><textarea name="description" placeholder="description">${data}</textarea></p>
+          <p><input type="submit" /></p>
+          </form>
+          `,
+          `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+        );
+
+        response.writeHead(200);
+        response.end(template);
+      });
+    });
   } else {
     response.writeHead(404);
     response.end("Not Found");
   }
 });
 app.listen(3000); //서버가 사용하고자 하는 포트 번호
+
+/*
+<<글 수정>>
+
+<input type="hidden" name="id" value="${title}"> 코드에 대해서:
+id는 수정할 파일의 (이전) 이름을 갖고 있기 위해서 (화면에는 보이지 않도록 type="hidden" 적용)
+*/
