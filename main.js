@@ -4,6 +4,7 @@ const url = require("url");
 const qs = require("querystring");
 const template = require("./lib/template.js");
 const path = require("path");
+const sanitizeHtml = require("sanitize-html");
 
 //웹 서버 객체를 만들때 createServer 를 이용
 //createServer로 전달된 콜백함수는 두개의 인자 (request, response)
@@ -38,15 +39,17 @@ let app = http.createServer((request, response) => {
         const filteredId = path.parse(queryData.id).base;
         fs.readFile(`data/${filteredId}`, "utf8", (err, data) => {
           const title = queryData.id;
+          const sanitizedTitle = sanitizeHtml(title);
+          const sanitizedDescription = sanitizeHtml(data);
           const list = template.list(fileList);
           const html = template.HTML(
-            title,
+            sanitizedTitle,
             list,
-            `<h2>${title}</h2>${data}`,
+            `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
             `<a href="/create">create</a> 
-             <a href="/update?id=${title}">update</a>
+             <a href="/update?id=${sanitizedTitle}">update</a>
              <form action="delete_process" method="post">
-             <input type="hidden" name="id" value="${title}">
+             <input type="hidden" name="id" value="${sanitizedTitle}">
              <input type="submit" value="delete">
              </form>
              `
@@ -188,4 +191,11 @@ path.parse('../password.js');
  ext: '.js',
  name: 'password' } // 리턴 값
 
+ -----
+
+<<출력정보에 대한 보안>>
+
+입력 본문에 <script>와 같이 예민한 태그 등이 포함되어 있으면
+보안적인 문제 위험이 있다
+-> sanitize-html 모듈을 사용해보자
 */

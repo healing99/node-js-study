@@ -1,0 +1,25 @@
+{
+  "name": "js-study",
+  "version": "1.0.0",
+  "description": "[생활코딩 Node.js 강좌](https://opentutorials.org/course/3332/21028)를 통해\r 기본적인 내용 학습하기",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/healing99/node-js-study.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/healing99/node-js-study/issues"
+  },
+  "homepage": "https://github.com/healing99/node-js-study#readme",
+  "dependencies": {
+    "sanitize-html": "^2.4.0"
+  }
+}
