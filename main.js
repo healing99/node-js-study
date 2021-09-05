@@ -103,8 +103,8 @@ let app = http.createServer((request, response) => {
       const description = post.description;
       fs.writeFile(`data/${title}`, description, "utf8", (err) => {
         //파일 저장이 끝난 다음 실행될 코드
-        response.writeHead(200);
-        response.end("success");
+        response.writeHead(302, { Location: `/?id=${title}` }); //status code 302 : 주어진 URL에 일시적으로 이동되었음을 가리킴
+        response.end();
       });
     });
   } else {
@@ -113,7 +113,3 @@ let app = http.createServer((request, response) => {
   }
 });
 app.listen(3000); //서버가 사용하고자 하는 포트 번호
-
-/*
-
- */
