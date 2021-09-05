@@ -137,6 +137,26 @@ let app = http.createServer((request, response) => {
         response.end(template);
       });
     });
+  } else if (pathname === "/update_process") {
+    let body = "";
+    request.on("data", (data) => {
+      body = body + data;
+    });
+    request.on("end", () => {
+      const post = qs.parse(body);
+      const id = post.id;
+      const title = post.title;
+      const description = post.description;
+      fs.rename(`data/${id}`, `data/${title}`, (error) => {
+        // 기존 파일의 이름 수정하기
+        fs.writeFile(`data/${title}`, description, "utf8", (err) => {
+          // 본문 description 내용 수정
+          response.writeHead(302, { Location: `/?id=${title}` }); //status code 302 : 주어진 URL에 일시적으로 이동되었음을 가리킴
+          response.end();
+        });
+      });
+      console.log(post);
+    });
   } else {
     response.writeHead(404);
     response.end("Not Found");
