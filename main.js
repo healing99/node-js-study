@@ -3,6 +3,7 @@ const fs = require("fs");
 const url = require("url");
 const qs = require("querystring");
 const template = require("./lib/template.js");
+const path = require("path");
 
 //웹 서버 객체를 만들때 createServer 를 이용
 //createServer로 전달된 콜백함수는 두개의 인자 (request, response)
@@ -34,7 +35,8 @@ let app = http.createServer((request, response) => {
       });
     } else {
       fs.readdir("./data", (error, fileList) => {
-        fs.readFile(`data/${queryData.id}`, "utf8", (err, data) => {
+        const filteredId = path.parse(queryData.id).base;
+        fs.readFile(`data/${filteredId}`, "utf8", (err, data) => {
           const title = queryData.id;
           const list = template.list(fileList);
           const html = template.HTML(
@@ -94,8 +96,9 @@ let app = http.createServer((request, response) => {
       });
     });
   } else if (pathname === "/update") {
+    const filteredId = path.parse(queryData.id).base;
     fs.readdir("./data", (error, fileList) => {
-      fs.readFile(`data/${queryData.id}`, "utf8", (err, data) => {
+      fs.readFile(`data/${filteredId}`, "utf8", (err, data) => {
         const title = queryData.id;
         const list = template.list(fileList);
         const html = template.HTML(
@@ -144,7 +147,8 @@ let app = http.createServer((request, response) => {
     request.on("end", () => {
       const post = qs.parse(body);
       const id = post.id;
-      fs.unlink(`data/${id}`, (error) => {
+      const filteredId = path.parse(id).base;
+      fs.unlink(`data/${filteredId}`, (error) => {
         response.writeHead(302, { Location: "/" });
         response.end();
       });
@@ -162,8 +166,26 @@ app.listen(3000); //서버가 사용하고자 하는 포트 번호
 <input type="hidden" name="id" value="${title}"> 코드에 대해서:
 id는 수정할 파일의 (이전) 이름을 갖고 있기 위해서 (화면에는 보이지 않도록 type="hidden" 적용)
 
+-----
+
 <<글 삭제>>
 delete는 링크로 구현하면 안된다!!
 form 태그 사용
 method는 반드시 "post"
+
+-----
+
+<<입력정보에 대한 보안>>
+path 모듈은 파일, 폴더, 디렉토리 등의 경로를 편리하게 설정할 수 있는 기능 제공
+
+"안전하게" 경로를 설정하기 위해서 path 모듈의 메소드 사용하자
+
+[예시]
+path.parse('../password.js');  
+{ root: '',
+ dir: '..',
+ base: 'password.js',
+ ext: '.js',
+ name: 'password' } // 리턴 값
+
 */
