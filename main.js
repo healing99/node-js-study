@@ -101,9 +101,12 @@ let app = http.createServer((request, response) => {
       const post = qs.parse(body); //parse : 객체화
       const title = post.title;
       const description = post.description;
+      fs.writeFile(`data/${title}`, description, "utf8", (err) => {
+        //파일 저장이 끝난 다음 실행될 코드
+        response.writeHead(200);
+        response.end("success");
+      });
     });
-    response.writeHead(200);
-    response.end("success");
   } else {
     response.writeHead(404);
     response.end("Not Found");
