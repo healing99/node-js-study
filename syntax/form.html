@@ -1,0 +1,13 @@
+<form action="http://localhost:3000/process_create" method="post">
+  <p><input type="text" name="title" /></p>
+  <p><textarea name="description"></textarea></p>
+  <p><input type="submit" /></p>
+</form>
+
+<!--
+HTML form 안에 사용자가 입력한 정보를 submit하면 
+action속성이 가리키는 서버로 query string의 형태로 데이터를 전송한다
+
+다만! 서버에 데이터를 생성, 수정, 삭제 등을 할때 url 주소상에
+데이터가 포함되는건 좋지 않은 방법이므로 method = "post"를 이용한다
+-->
