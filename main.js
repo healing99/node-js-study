@@ -68,7 +68,13 @@ let app = http.createServer((request, response) => {
             title,
             list,
             `<h2>${title}</h2>${data}`,
-            `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+            `<a href="/create">create</a> 
+             <a href="/update?id=${title}">update</a>
+             <form action="delete_process" method="post">
+             <input type="hidden" name="id" value="${title}">
+             <input type="submit" value="delete">
+             </form>
+             `
           );
 
           response.writeHead(200);
@@ -169,4 +175,9 @@ app.listen(3000); //서버가 사용하고자 하는 포트 번호
 
 <input type="hidden" name="id" value="${title}"> 코드에 대해서:
 id는 수정할 파일의 (이전) 이름을 갖고 있기 위해서 (화면에는 보이지 않도록 type="hidden" 적용)
+
+<<글 삭제>>
+delete는 링크로 구현하면 안된다!!
+form 태그 사용
+method는 반드시 "post"
 */
