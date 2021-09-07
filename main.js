@@ -5,6 +5,17 @@ const qs = require("querystring");
 const template = require("./lib/template.js");
 const path = require("path");
 const sanitizeHtml = require("sanitize-html");
+const db_config = require("./config.json");
+
+const mysql = require("mysql");
+const db = mysql.createConnection({
+  host: db_config.host,
+  user: db_config.user,
+  password: db_config.password,
+  database: db_config.database
+});
+
+db.connect();
 
 //웹 서버 객체를 만들때 createServer 를 이용
 //createServer로 전달된 콜백함수는 두개의 인자 (request, response)
@@ -18,21 +29,25 @@ let app = http.createServer((request, response) => {
 
   if (pathname === "/") {
     if (queryData.id === undefined) {
-      fs.readdir("./data", (error, fileList) => {
-        const title = "Welcome";
-        data = "Hello, Node.js";
+      // fs.readdir("./data", (error, fileList) => {
+      //   const title = "Welcome";
+      //   data = "Hello, Node.js";
 
-        const list = template.list(fileList);
+      //   const list = template.list(fileList);
 
-        const html = template.HTML(
-          title,
-          list,
-          `<h2>${title}</h2>${data}`,
-          `<a href="/create">create</a>`
-        );
+      //   const html = template.HTML(
+      //     title,
+      //     list,
+      //     `<h2>${title}</h2>${data}`,
+      //     `<a href="/create">create</a>`
+      //   );
 
+      //   response.writeHead(200);
+      //   response.end(html);
+      db.query(`SELECT * FROM topic`, (error, topics) => {
+        console.log(topics);
         response.writeHead(200);
-        response.end(html);
+        response.end("SUCCESS");
       });
     } else {
       fs.readdir("./data", (error, fileList) => {
