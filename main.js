@@ -44,29 +44,37 @@ let app = http.createServer((request, response) => {
         response.end(html);
       });
     } else {
-      fs.readdir("./data", (error, fileList) => {
-        const filteredId = path.parse(queryData.id).base;
-        fs.readFile(`data/${filteredId}`, "utf8", (err, data) => {
-          const title = queryData.id;
-          const sanitizedTitle = sanitizeHtml(title);
-          const sanitizedDescription = sanitizeHtml(data);
-          const list = template.list(fileList);
-          const html = template.HTML(
-            sanitizedTitle,
-            list,
-            `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
-            `<a href="/create">create</a> 
-             <a href="/update?id=${sanitizedTitle}">update</a>
+      db.query("SELECT * FROM topic", (error, topics) => {
+        if (error) {
+          throw error;
+        }
+        //해당하는 id의 정보 가져오기
+        db.query(
+          `SELECT * FROM topic WHERE id=?`,
+          [queryData.id],
+          (error2, topic) => {
+            if (error2) {
+              throw error2;
+            }
+            const title = topic[0].title;
+            description = topic[0].description;
+            const list = template.list(topics);
+            const html = template.HTML(
+              title,
+              list,
+              `<h2>${title}</h2>${description}`,
+              `<a href="/create">create</a>
+             <a href="/update?id=${queryData.id}">update</a>
              <form action="delete_process" method="post">
-             <input type="hidden" name="id" value="${sanitizedTitle}">
+             <input type="hidden" name="id" value="${queryData.id}">
              <input type="submit" value="delete">
              </form>
-             `
-          );
-
-          response.writeHead(200);
-          response.end(html);
-        });
+              `
+            );
+            response.writeHead(200);
+            response.end(html);
+          }
+        );
       });
     }
   } else if (pathname === "/create") {
@@ -207,4 +215,14 @@ path.parse('../password.js');
 입력 본문에 <script>와 같이 예민한 태그 등이 포함되어 있으면
 보안적인 문제 위험이 있다
 -> sanitize-html 모듈을 사용해보자
+*/
+
+/*
+[ Node.js + MySQL ]
+
+<<SQL injection 예방하기>>
+db.query('SELECT * FROM topic WHERE id=?',[queryData.id], function(err, data)
+-> 이와 같이 query 메서드를 사용할때 2번째 인자로 입력데이터(queryData.id)를 주고
+1번째 인자의 해당 부분을 `?` 변수로 치환하면된다
+
 */
