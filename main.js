@@ -82,22 +82,27 @@ let app = http.createServer((request, response) => {
     }
   } else if (pathname === "/create") {
     db.query(`SELECT * FROM topic`, (error, topics) => {
-      const title = "Create";
-      const list = template.list(topics);
-      const html = template.HTML(
-        title,
-        list,
-        `
+      db.query("SELECT * FROM author", (error2, authors) => {
+        const title = "Create";
+        const list = template.list(topics);
+        const html = template.HTML(
+          title,
+          list,
+          `
       <form action="/create_process" method="post">
       <p><input type="text" name="title" placeholder="title"/></p>
       <p><textarea name="description" placeholder="description"></textarea></p>
+      <p>
+      ${template.authorSelect(authors)}
+      </p>
       <p><input type="submit" /></p>
       </form>
       `,
-        ""
-      );
-      response.writeHead(200);
-      response.end(html);
+          ""
+        );
+        response.writeHead(200);
+        response.end(html);
+      });
     });
   } else if (pathname === "/create_process") {
     let body = "";
@@ -111,7 +116,7 @@ let app = http.createServer((request, response) => {
 
       db.query(
         `INSERT INTO topic (title, description, created, author_id) VALUES(?, ?,  NOW(), ?);`,
-        [post.title, post.description, 1],
+        [post.title, post.description, post.author],
         (error, result) => {
           if (error) throw error;
           response.writeHead(302, { Location: `/?id=${result.insertId}` }); //getting the id of an inserted row 방법
