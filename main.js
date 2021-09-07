@@ -78,10 +78,9 @@ let app = http.createServer((request, response) => {
       });
     }
   } else if (pathname === "/create") {
-    fs.readdir("./data", (error, fileList) => {
-      const title = "WEB - create";
-      const list = template.list(fileList);
-
+    db.query(`SELECT * FROM topic`, (error, topics) => {
+      const title = "Create";
+      const list = template.list(topics);
       const html = template.HTML(
         title,
         list,
@@ -94,7 +93,6 @@ let app = http.createServer((request, response) => {
       `,
         ""
       );
-
       response.writeHead(200);
       response.end(html);
     });
@@ -107,13 +105,16 @@ let app = http.createServer((request, response) => {
     request.on("end", () => {
       //request에 data 처리가 다 끝났음을 알려주는 부분
       const post = qs.parse(body); //parse : 객체화
-      const title = post.title;
-      const description = post.description;
-      fs.writeFile(`data/${title}`, description, "utf8", (err) => {
-        //파일 저장이 끝난 다음 실행될 코드
-        response.writeHead(302, { Location: `/?id=${title}` }); //status code 302 : 주어진 URL에 일시적으로 이동되었음을 가리킴
-        response.end();
-      });
+
+      db.query(
+        `INSERT INTO topic (title, description, created, author_id) VALUES(?, ?,  NOW(), ?);`,
+        [post.title, post.description, 1],
+        (error, result) => {
+          if (error) throw error;
+          response.writeHead(302, { Location: `/?id=${result.insertId}` }); //getting the id of an inserted row 방법
+          response.end();
+        }
+      );
     });
   } else if (pathname === "/update") {
     const filteredId = path.parse(queryData.id).base;
