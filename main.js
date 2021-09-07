@@ -117,28 +117,32 @@ let app = http.createServer((request, response) => {
       );
     });
   } else if (pathname === "/update") {
-    const filteredId = path.parse(queryData.id).base;
-    fs.readdir("./data", (error, fileList) => {
-      fs.readFile(`data/${filteredId}`, "utf8", (err, data) => {
-        const title = queryData.id;
-        const list = template.list(fileList);
-        const html = template.HTML(
-          title,
-          list,
-          ` 
+    db.query("SELECT * FROM topic", (error, topics) => {
+      if (error) throw error;
+      db.query(
+        "SELECT * FROM topic WHERE id=?",
+        [queryData.id],
+        (error2, topic) => {
+          if (error2) throw error2;
+          const list = template.list(topics);
+          const html = template.HTML(
+            topic[0].title,
+            list,
+            `
           <form action="/update_process" method="post">
-          <input type="hidden" name="id" value="${title}">
-          <p><input type="text" name="title" placeholder="title" value="${title}"/></p>
-          <p><textarea name="description" placeholder="description">${data}</textarea></p>
+          <input type="hidden" name="id" value="${topic[0].id}">
+          <p><input type="text" name="title" placeholder="title" value="${topic[0].title}"/></p>
+          <p><textarea name="description" placeholder="description">${topic[0].description}</textarea></p>
           <p><input type="submit" /></p>
           </form>
           `,
-          `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
-        );
+            `<a href="/create">create</a> <a href="/update?id=${topic[0].id}">update</a>`
+          );
 
-        response.writeHead(200);
-        response.end(html);
-      });
+          response.writeHead(200);
+          response.end(html);
+        }
+      );
     });
   } else if (pathname === "/update_process") {
     let body = "";
@@ -147,18 +151,15 @@ let app = http.createServer((request, response) => {
     });
     request.on("end", () => {
       const post = qs.parse(body);
-      const id = post.id;
-      const title = post.title;
-      const description = post.description;
-      fs.rename(`data/${id}`, `data/${title}`, (error) => {
-        // 기존 파일의 이름 수정하기
-        fs.writeFile(`data/${title}`, description, "utf8", (err) => {
-          // 본문 description 내용 수정
-          response.writeHead(302, { Location: `/?id=${title}` }); //status code 302 : 주어진 URL에 일시적으로 이동되었음을 가리킴
+      db.query(
+        "UPDATE topic SET title=?, description=?, author_id=1 WHERE id=?",
+        [post.title, post.description, post.id],
+        (error, result) => {
+          if (error) throw error;
+          response.writeHead(302, { Location: `/?id=${post.id}` }); //status code 302 : 주어진 URL에 일시적으로 이동되었음을 가리킴
           response.end();
-        });
-      });
-      console.log(post);
+        }
+      );
     });
   } else if (pathname === "/delete_process") {
     let body = "";
