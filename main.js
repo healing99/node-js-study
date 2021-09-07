@@ -132,23 +132,30 @@ let app = http.createServer((request, response) => {
         [queryData.id],
         (error2, topic) => {
           if (error2) throw error2;
-          const list = template.list(topics);
-          const html = template.HTML(
-            topic[0].title,
-            list,
-            `
+          db.query("SELECT * FROM author", (error3, authors) => {
+            const list = template.list(topics);
+            const html = template.HTML(
+              topic[0].title,
+              list,
+              `
           <form action="/update_process" method="post">
           <input type="hidden" name="id" value="${topic[0].id}">
-          <p><input type="text" name="title" placeholder="title" value="${topic[0].title}"/></p>
-          <p><textarea name="description" placeholder="description">${topic[0].description}</textarea></p>
+          <p><input type="text" name="title" placeholder="title" value="${
+            topic[0].title
+          }"/></p>
+          <p><textarea name="description" placeholder="description">${
+            topic[0].description
+          }</textarea></p>
+          <p>${template.authorSelect(authors, topic[0].author_id)}</p>
           <p><input type="submit" /></p>
           </form>
           `,
-            `<a href="/create">create</a> <a href="/update?id=${topic[0].id}">update</a>`
-          );
+              `<a href="/create">create</a> <a href="/update?id=${topic[0].id}">update</a>`
+            );
 
-          response.writeHead(200);
-          response.end(html);
+            response.writeHead(200);
+            response.end(html);
+          });
         }
       );
     });
@@ -160,8 +167,8 @@ let app = http.createServer((request, response) => {
     request.on("end", () => {
       const post = qs.parse(body);
       db.query(
-        "UPDATE topic SET title=?, description=?, author_id=1 WHERE id=?",
-        [post.title, post.description, post.id],
+        "UPDATE topic SET title=?, description=?, author_id=? WHERE id=?",
+        [post.title, post.description, post.author, post.id],
         (error, result) => {
           if (error) throw error;
           response.writeHead(302, { Location: `/?id=${post.id}` }); //status code 302 : 주어진 URL에 일시적으로 이동되었음을 가리킴
