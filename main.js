@@ -1,21 +1,8 @@
 const http = require("http");
-const fs = require("fs");
 const url = require("url");
 const qs = require("querystring");
 const template = require("./lib/template.js");
-const path = require("path");
-const sanitizeHtml = require("sanitize-html");
-const db_config = require("./config.json");
-
-const mysql = require("mysql");
-const db = mysql.createConnection({
-  host: db_config.host,
-  user: db_config.user,
-  password: db_config.password,
-  database: db_config.database
-});
-
-db.connect();
+const db = require("./lib/db");
 
 //웹 서버 객체를 만들때 createServer 를 이용
 //createServer로 전달된 콜백함수는 두개의 인자 (request, response)
@@ -30,7 +17,6 @@ let app = http.createServer((request, response) => {
   if (pathname === "/") {
     if (queryData.id === undefined) {
       db.query(`SELECT * FROM topic`, (error, topics) => {
-        console.log(topics);
         const title = "Welcome";
         description = "Hello, Node.js";
         const list = template.list(topics);
@@ -56,7 +42,6 @@ let app = http.createServer((request, response) => {
             if (error2) {
               throw error2;
             }
-            console.log(topic);
             const title = topic[0].title;
             description = topic[0].description;
             const list = template.list(topics);
