@@ -29,25 +29,19 @@ let app = http.createServer((request, response) => {
 
   if (pathname === "/") {
     if (queryData.id === undefined) {
-      // fs.readdir("./data", (error, fileList) => {
-      //   const title = "Welcome";
-      //   data = "Hello, Node.js";
-
-      //   const list = template.list(fileList);
-
-      //   const html = template.HTML(
-      //     title,
-      //     list,
-      //     `<h2>${title}</h2>${data}`,
-      //     `<a href="/create">create</a>`
-      //   );
-
-      //   response.writeHead(200);
-      //   response.end(html);
       db.query(`SELECT * FROM topic`, (error, topics) => {
         console.log(topics);
+        const title = "Welcome";
+        description = "Hello, Node.js";
+        const list = template.list(topics);
+        const html = template.HTML(
+          title,
+          list,
+          `<h2>${title}</h2>${description}`,
+          `<a href="/create">create</a>`
+        );
         response.writeHead(200);
-        response.end("SUCCESS");
+        response.end(html);
       });
     } else {
       fs.readdir("./data", (error, fileList) => {
