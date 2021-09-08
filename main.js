@@ -1,6 +1,7 @@
 const http = require("http");
 const url = require("url");
 const topic = require("./lib/topic");
+const author = require("./lib/author");
 
 //웹 서버 객체를 만들때 createServer 를 이용
 //createServer로 전달된 콜백함수는 두개의 인자 (request, response)
@@ -28,6 +29,8 @@ let app = http.createServer((request, response) => {
     topic.update_process(request, response);
   } else if (pathname === "/delete_process") {
     topic.delete_process(request, response);
+  } else if (pathname === "/author") {
+    author.home(request, response);
   } else {
     response.writeHead(404);
     response.end("Not Found");
