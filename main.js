@@ -19,6 +19,9 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/page/:pageId", (req, res) => {
+  res.send(req.params);
+});
 app.listen(3000, () => console.log("Example app listening on port 3000"));
 
 /*
