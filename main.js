@@ -5,6 +5,9 @@ const bodyParser = require("body-parser");
 const compression = require("compression"); //압축된 방식으로 데이터 사용할 수 있음
 const indexRouter = require("./routes/index");
 const topicRouter = require("./routes/topic");
+const helmet = require("helmet"); //보안 목적
+
+app.use(helmet()); //미들웨어 load시켜주기
 
 app.use(express.static("public")); //public 디렉토리안에서 정적파일을 찾겠다
 app.use(bodyParser.urlencoded({ extended: false }));
