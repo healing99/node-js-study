@@ -140,6 +140,11 @@ app.post("/delete_process", (req, res) => {
   });
 });
 
+//더 이상 실행할 미들웨어x 경우
+app.use((req, res, next) => {
+  res.status(404).send("Sorry can't find the page");
+});
+
 app.listen(3000, () => console.log("Example app listening on port 3000"));
 
 /*
