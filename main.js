@@ -8,6 +8,7 @@ const qs = require("querystring");
 const bodyParser = require("body-parser");
 const compression = require("compression"); //압축된 방식으로 데이터 사용할 수 있음
 
+app.use(express.static("public")); //public 디렉토리안에서 정적파일을 찾겠다
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(compression());
 app.get("*", (req, res, next) => {
@@ -26,7 +27,9 @@ app.get("/", (req, res) => {
   const html = template.HTML(
     title,
     list,
-    `<h2>${title}</h2>${description}`,
+    `<h2>${title}</h2>${description}
+    <img src="/images/hello.jpg" style="width: 300px; display: block; margin-top: 10px;">
+    `,
     `<a href="/create">create</a>`
   );
   res.send(html);
