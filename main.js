@@ -4,6 +4,7 @@ const fs = require("fs");
 const template = require("./lib/template");
 const path = require("path");
 const sanitizeHtml = require("sanitize-html");
+const qs = require("querystring");
 
 //라우팅
 app.get("/", (req, res) => {
@@ -46,6 +47,47 @@ app.get("/page/:pageId", (req, res) => {
     });
   });
 });
+
+app.get("/create", (req, res) => {
+  fs.readdir("./data", (error, filelist) => {
+    const title = "WEB - create";
+    const list = template.list(filelist);
+    const html = template.HTML(
+      title,
+      list,
+      `
+      <form action="/create_process" method="post">
+        <p><input type="text" name="title" placeholder="title"></p>
+        <p>
+          <textarea name="description" placeholder="description"></textarea>
+        </p>
+        <p>
+          <input type="submit">
+        </p>
+      </form>
+    `,
+      ""
+    );
+    res.send(html);
+  });
+});
+
+app.post("/create_process", (req, res) => {
+  let body = "";
+  req.on("data", (data) => {
+    body = body + data;
+  });
+  req.on("end", () => {
+    const post = qs.parse(body);
+    const title = post.title;
+    const description = post.description;
+    fs.writeFile(`data/${title}`, description, "utf8", (err) => {
+      res.writeHead(302, { Location: `/?id=${title}` });
+      res.end();
+    });
+  });
+});
+
 app.listen(3000, () => console.log("Example app listening on port 3000"));
 
 /*
