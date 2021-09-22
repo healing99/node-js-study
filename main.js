@@ -35,27 +35,31 @@ app.get("/", (req, res) => {
   res.send(html);
 });
 
-app.get("/page/:pageId", (req, res) => {
+app.get("/page/:pageId", (req, res, next) => {
   const filteredId = path.parse(req.params.pageId).base;
   fs.readFile(`data/${filteredId}`, "utf8", (error, description) => {
-    const title = req.params.pageId;
-    const sanitizedTitle = sanitizeHtml(title);
-    const sanitizedDescription = sanitizeHtml(description, {
-      allowedTags: ["h1"]
-    });
-    const list = template.list(req.list);
-    const html = template.HTML(
-      sanitizedTitle,
-      list,
-      `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
-      ` <a href="/create">create</a>
-          <a href="/update/${sanitizedTitle}">update</a>
-          <form action="/delete_process" method="post">
-            <input type="hidden" name="id" value="${sanitizedTitle}">
-            <input type="submit" value="delete">
-          </form>`
-    );
-    res.send(html);
+    if (error) {
+      next(error); //아래에 작성한 4개의 인자를 가진 미들웨어 호출됨
+    } else {
+      const title = req.params.pageId;
+      const sanitizedTitle = sanitizeHtml(title);
+      const sanitizedDescription = sanitizeHtml(description, {
+        allowedTags: ["h1"]
+      });
+      const list = template.list(req.list);
+      const html = template.HTML(
+        sanitizedTitle,
+        list,
+        `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
+        ` <a href="/create">create</a>
+            <a href="/update/${sanitizedTitle}">update</a>
+            <form action="/delete_process" method="post">
+              <input type="hidden" name="id" value="${sanitizedTitle}">
+              <input type="submit" value="delete">
+            </form>`
+      );
+      res.send(html);
+    }
   });
 });
 
@@ -143,6 +147,12 @@ app.post("/delete_process", (req, res) => {
 //더 이상 실행할 미들웨어x 경우
 app.use((req, res, next) => {
   res.status(404).send("Sorry can't find the page");
+});
+
+//4가지 인자를 가짐 - 에러 핸들링을 위한 미들웨어
+app.use((err, req, res, next) => {
+  console.log(err.stack);
+  res.status(500).send("Something Wrong");
 });
 
 app.listen(3000, () => console.log("Example app listening on port 3000"));
