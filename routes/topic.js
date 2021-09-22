@@ -4,7 +4,6 @@ const path = require("path");
 const fs = require("fs");
 const sanitizeHtml = require("sanitize-html");
 const template = require("../lib/template");
-const qs = require("querystring");
 
 router.get("/create", (req, res) => {
   const title = "WEB - create";
