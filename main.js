@@ -6,8 +6,11 @@ const path = require("path");
 const sanitizeHtml = require("sanitize-html");
 const qs = require("querystring");
 const bodyParser = require("body-parser");
+const compression = require("compression"); //압축된 방식으로 데이터 사용할 수 있음
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(compression());
+
 //라우팅
 app.get("/", (req, res) => {
   fs.readdir("./data", (error, fileList) => {
