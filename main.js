@@ -6,6 +6,19 @@ const compression = require("compression"); //압축된 방식으로 데이터 �
 const indexRouter = require("./routes/index");
 const topicRouter = require("./routes/topic");
 const helmet = require("helmet"); //보안 목적
+const cookie = require("cookie");
+
+const isLoggedInFunc = (req, res) => {
+  let isLoggedIn = false;
+  let cookies = {};
+  if (req.headers.cookie) {
+    cookies = cookie.parse(req.headers.cookie);
+  }
+  if (cookies.email === "test@gmail.com" && cookies.password === "1234") {
+    isLoggedIn = true;
+  }
+  return isLoggedIn;
+};
 
 app.use(helmet()); //미들웨어 load시켜주기
 
@@ -18,6 +31,8 @@ app.get("*", (req, res, next) => {
     req.list = fileList; //req객체의 list변수에 fileList값을 줌
     next(); //next()를 호출해야 다음 미들웨어로 넘어갈 수 있음
   });
+  const isLoggedIn = isLoggedInFunc(req, res);
+  console.log(isLoggedIn);
 });
 
 app.use("/", indexRouter);
