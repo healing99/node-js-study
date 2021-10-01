@@ -35,4 +35,19 @@ router.get("/login", (req, res) => {
   res.send(html);
 });
 
+router.post("/login_process", (req, res) => {
+  const post = req.body;
+  const email = post.email;
+  const password = post.password;
+  if (email === "test@gmail.com" && password === "1234") {
+    res.writeHead(302, {
+      "Set-Cookie": [`email=${email}`, `password=${password}`, `nickname=ysys`],
+      Location: "/"
+    });
+    res.end();
+  } else {
+    res.end("Wrong Account");
+  }
+});
+
 module.exports = router;
