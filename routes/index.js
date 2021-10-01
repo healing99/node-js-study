@@ -17,4 +17,22 @@ router.get("/", (req, res) => {
   res.send(html);
 });
 
+router.get("/login", (req, res) => {
+  const title = "WEB - create";
+  const list = template.list(req.list);
+  const html = template.HTML(
+    title,
+    list,
+    `
+      <form action="/login_process" method="post">
+        <p><input type="text" name="email" placeholder="email"></p>
+        <p><input type="password" name="password" placeholder="password"></p>
+        <p><input type="submit"></p>
+      </form>
+    `,
+    ""
+  );
+  res.send(html);
+});
+
 module.exports = router;
