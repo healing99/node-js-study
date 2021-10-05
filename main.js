@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const compression = require("compression"); //압축된 방식으로 데이터 사용할 수 있음
 const indexRouter = require("./routes/index");
 const topicRouter = require("./routes/topic");
+const authRouter = require("./routes/auth");
 const helmet = require("helmet"); //보안 목적
 const cookie = require("cookie");
 
@@ -37,6 +38,7 @@ app.get("*", (req, res, next) => {
 
 app.use("/", indexRouter);
 app.use("/topic", topicRouter); // "/topic"으로 시작하는 주소에 topicRouter라는 이름의 미들웨어를 적용하겠다
+app.use("/auth", authRouter);
 
 //더 이상 실행할 미들웨어x 경우
 app.use((req, res, next) => {
