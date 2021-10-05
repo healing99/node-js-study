@@ -1,6 +1,7 @@
 const express = require("express");
 const parseurl = require("parseurl");
 const session = require("express-session");
+const FileStore = require("session-file-store")(session);
 const secret = require("../secret");
 
 const app = express();
@@ -11,7 +12,8 @@ app.use(
     // 세션 동작 옵션
     secret: secret.secretId,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    store: new FileStore()
   })
 );
 
