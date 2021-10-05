@@ -2,6 +2,12 @@ const express = require("express");
 const router = express.Router();
 const template = require("../lib/template");
 
+const authData = {
+  email: "test@gmail.com",
+  password: "1234",
+  nickname: "nickname"
+};
+
 router.get("/login", (req, res) => {
   const title = "WEB - create";
   const list = template.list(req.list);
@@ -20,19 +26,15 @@ router.get("/login", (req, res) => {
   res.send(html);
 });
 
-// router.post("/login_process", (req, res) => {
-//   const post = req.body;
-//   const email = post.email;
-//   const password = post.password;
-//   if (email === "test@gmail.com" && password === "1234") {
-//     res.writeHead(302, {
-//       "Set-Cookie": [`email=${email}`, `password=${password}`, `nickname=ysys`],
-//       Location: "/"
-//     });
-//     res.end();
-//   } else {
-//     res.end("Wrong Account");
-//   }
-// });
+router.post("/login_process", (req, res) => {
+  const post = req.body;
+  const email = post.email;
+  const password = post.password;
+  if (email === authData.email && password === authData.password) {
+    res.send("Welcome");
+  } else {
+    res.send("Wrong Account");
+  }
+});
 
 module.exports = router;
